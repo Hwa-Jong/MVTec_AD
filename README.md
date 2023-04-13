@@ -1,2 +1,2 @@
-# MVTeck_AD
-MVTeck_AD study
+# MVTec_AD
+MVTec_AD study

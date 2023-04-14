@@ -59,27 +59,6 @@ class Mvtec(data.Dataset):
         y = torch.from_numpy(y)
 
         return x, y
-        
-        if self.mode == 'train':
-            x = self.preprocessing(x)
-            y = torch.from_numpy(x)
-        else: # if test mode...
-            path = path.replace('test', 'ground_truth')
-            path = path.replace('.png', '_mask.png')
-            if os.path.exists(path):
-                y = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-                y = y[..., np.newaxis]
-            else:
-                y = np.zeros_like(x)
-                y = y[..., 0:1]
-            
-            x = self.preprocessing(x)
-            y = self.preprocessing(y)
-            y = torch.from_numpy(y)
-                
-        x = torch.from_numpy(x)
-
-        return x, y
 
     def preprocessing(self, img):
         img = np.swapaxes(img, 2, 1)

@@ -31,8 +31,18 @@ def get_save_dir_name(opt, mode, makedir=False):
 
 
 def postprocessing(inputs, preds, threshold):
-    similarity = torch.nn.functional.cosine_similarity(inputs, preds, dim=1)
-    anomaly = (similarity < threshold).to(torch.float32)
+    # similarity = torch.nn.functional.cosine_similarity(inputs, preds, dim=1)
+    # anomaly = (similarity < threshold).to(torch.float32)
+    # return anomaly.unsqueeze(1)
+
+    diff = (inputs - preds) ** 2
+    diff = diff.sum(1)
+    anomaly = (diff > threshold).to(torch.float32)
+    return anomaly.unsqueeze(1)
+
+def postprocessing_diff(diff, threshold):
+    diff = (diff**2).mean(1)
+    anomaly = (diff > threshold).to(torch.float32)    
     return anomaly.unsqueeze(1)
 
 
@@ -42,7 +52,16 @@ def save_img_from_tensor( save_name, tensor ):
     arr = np.clip(arr, 0, 255)
     arr = arr.astype(np.uint8)
     arr = np.swapaxes(arr, 0, 1)
-    arr = np.swapaxes(arr, 1, 2)
+    arr = np.swapaxes(arr, 1, 2)    
+    cv2.imwrite(save_name, arr )
+
+def save_img_from_array( save_name, arr ):
+    arr = arr*255
+    arr = np.clip(arr, 0, 255)
+    arr = arr.astype(np.uint8)
+    if len(arr) == 3:
+        arr = np.swapaxes(arr, 0, 1)
+        arr = np.swapaxes(arr, 1, 2)
     cv2.imwrite(save_name, arr )
 
 

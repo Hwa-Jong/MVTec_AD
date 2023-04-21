@@ -7,9 +7,9 @@ import torch.utils.data as data
 from easydict import EasyDict
 
 def main():
-    #dataset = Mvtec('.\\dataset\\mvtec_anomaly_detection\\capsule', mode='train', aug=[])
+    # dataset = Mvtec('.\\dataset\\mvtec_anomaly_detection\\capsule', mode='train', aug=[])
     dataset = Mvtec('.\\dataset\\mvtec_anomaly_detection\\capsule', mode='test', aug=[])
-    x, y = dataset.__getitem__(0)
+    x, y = dataset.__getitem__(45)
     print('finish')
 
 class Mvtec(data.Dataset):
@@ -41,22 +41,22 @@ class Mvtec(data.Dataset):
     def __getitem__(self, index):
         path = self.img_path[index]
         x = cv2.imread(path)
+        x = cv2.resize(x, (512,512))
         
         path = path.replace('test', 'ground_truth')
         path = path.replace('.png', '_mask.png')
 
         if os.path.exists(path):
-            y = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
-            y = y[..., np.newaxis]
+            # y = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
+            # y = cv2.resize(y, (512,512))
+            # y = y[..., np.newaxis]     
+            
+            y = torch.ones((1,), dtype=torch.int32)
         else:
-            y = np.zeros_like(x)
-            y = y[..., 0:1]
+            y = torch.zeros((1,), dtype=torch.int32)
 
         x = self.preprocessing(x)
-        y = self.preprocessing(y)
-
         x = torch.from_numpy(x)
-        y = torch.from_numpy(y)
 
         return x, y
 
